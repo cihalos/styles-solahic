@@ -24,10 +24,10 @@ update_solahic() {
 # Função para realizar o prompt colorido com base no usuário.
 color_prompt() {
     if [ "$USER" = "root" ]; then
-        # Execute git pull na pasta solahic e limpe a tela.
-        update_solahic
         COLOR_USER='\[\033[01;31m\]'  # Vermelho para root
     elif [ "$USER" = "esab" ]; then
+        # Execute git pull na pasta solahic e limpe a tela.
+        update_solahic
         COLOR_USER='\[\033[01;34m\]'  # Azul para esab
     else
         COLOR_USER='\[\033[01;32m\]'  # Verde para outros usuários
@@ -67,7 +67,6 @@ fi
 
 # Execute git push ao sair da pasta solahic.
 # check_exit_directory
-
 
 # Ative o preenchimento automático no bash em shells interativos.
 if ! shopt -oq posix; then
