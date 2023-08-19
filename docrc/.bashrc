@@ -1,0 +1,103 @@
+# Arquivo .bashrc para shells interativos bash(1).
+# Este arquivo deve ser carregado em /etc/profile para shells de login.
+
+# Armazene o diretório atual para verificar ao sair.
+export LAST_DIR="$(pwd)"
+
+# Função para verificar se saiu da pasta solahic e executar git push.
+check_exit_directory() {
+    if [ "$LAST_DIR" = "$HOME/solahic" ] && [ "$PWD" != "$HOME/solahic" ]; then
+        echo "Saindo da pasta solahic, realizando git push..."
+        cd ~/solahic && git push && cd "$OLDPWD"
+        LAST_DIR=""
+    fi
+}
+
+# Função para executar git pull na pasta solahic e limpar a tela.
+update_solahic() {
+    if [ -d ~/solahic ]; then
+        cd ~/solahic && git pull && cd "$OLDPWD"
+        sleep 3 && clear
+    fi
+}
+
+# Função para realizar o prompt colorido com base no usuário.
+color_prompt() {
+    if [ "$USER" = "root" ]; then
+        # Execute git pull na pasta solahic e limpe a tela.
+        update_solahic
+        COLOR_USER='\[\033[01;31m\]'  # Vermelho para root
+    elif [ "$USER" = "esab" ]; then
+        COLOR_USER='\[\033[01;34m\]'  # Azul para esab
+    else
+        COLOR_USER='\[\033[01;32m\]'  # Verde para outros usuários
+    fi
+
+    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;37m\]\t '"$COLOR_USER"'\u\[\033[01;36m\]@\[\033[01;36m\]\h\[\033[00m\]:\[\033[01;37m\]\w\[\033[01;32m\]\$ \[\033[00m\]'
+}
+
+# Defina o prompt elegante com as cores escolhidas.
+color_prompt
+
+# Verifique o tamanho da janela após cada comando e atualize LINES e COLUMNS.
+shopt -s checkwinsize
+
+# Defina a variável que identifica o chroot em que você está trabalhando (usado no prompt abaixo).
+if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
+    debian_chroot=$(cat /etc/debian_chroot)
+fi
+
+# Verifique se a pasta solahic não existe e clone o repositório.
+if [ ! -d ~/solahic ]; then
+    git clone git@github.com:cihalos/solahic.git ~/solahic
+
+    # Se o repositório ainda não existe, gere uma chave SSH se ela não existir.
+    if [ ! -f ~/.ssh/id_rsa.pub ]; then
+        ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/id_rsa
+        echo "Sua chave pública SSH:"
+        cat ~/.ssh/id_rsa.pub
+        echo "Copie e cole esta chave em suas configurações do GitHub ou onde for necessário."
+    fi
+fi
+
+# Carregue as personalizações do repositório solahic.
+if [ -d ~/solahic ]; then
+    source ~/solahic/.bashrc
+fi
+
+# Execute git push ao sair da pasta solahic.
+# check_exit_directory
+
+
+# Ative o preenchimento automático no bash em shells interativos.
+if ! shopt -oq posix; then
+    if [ -f /usr/share/bash-completion/bash_completion ]; then
+        . /usr/share/bash-completion/bash_completion
+    elif [ -f /etc/bash_completion ]; then
+        . /etc/bash_completion
+    fi
+fi
+
+# Configurações de cores para o comando 'ls'.
+export LS_OPTIONS='--color=auto'
+eval "$(dircolors)"
+alias ls='ls $LS_OPTIONS'
+alias ll='ls $LS_OPTIONS -l'
+alias l='ls $LS_OPTIONS -lA'
+
+# Se o pacote command-not-found estiver instalado, use-o.
+if [ -x /usr/lib/command-not-found -o -x /usr/share/command-not-found/command-not-found ]; then
+    function command_not_found_handle {
+        if [ -x /usr/lib/command-not-found ]; then
+            /usr/lib/command-not-found -- "$1"
+            return $?
+        elif [ -x /usr/share/command-not-found/command-not-found ]; then
+            /usr/share/command-not-found/command-not-found -- "$1"
+            return $?
+        else
+            printf "%s: comando não encontrado\n" "$1" >&2
+            return 127
+        fi
+    }
+fi
+
