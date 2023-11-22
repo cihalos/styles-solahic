@@ -1,0 +1,13 @@
+/*============================================================
+File: 
+Data: 
+-------------------------------------------------------------
+Graduando: Elias de Jesus Miranda 
+DOCENTE: ANA PAULA PIOVESAN MELCHIORI - DOCENTE
+Disciplina: Computação Gráfica (10A GAC104) 
+-------------------------------------------------------------*/
+
+#ifndef 
+#define  
+
+#endif

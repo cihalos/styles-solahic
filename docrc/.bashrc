@@ -5,13 +5,6 @@
 export LAST_DIR="$(pwd)"
 
 # Função para verificar se saiu da pasta solahic e executar git push.
-check_exit_directory() {
-    if [ "$LAST_DIR" = "$HOME/solahic" ] && [ "$PWD" != "$HOME/solahic" ]; then
-        echo "Saindo da pasta solahic, realizando git push..."
-        cd ~/solahic && git push && cd "$OLDPWD"
-        LAST_DIR=""
-    fi
-}
 
 # Função para executar git pull na pasta solahic e limpar a tela.
 update_solahic() {
@@ -48,8 +41,10 @@ if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
 fi
 
 # Verifique se a pasta solahic não existe e clone o repositório.
-if [ ! -d ~/solahic ]; then
-    git clone git@github.com:cihalos/solahic.git ~/solahic
+#if [ ! -d ~/solahic ]; then
+if [ ! -d /etc/solahic ]; then
+    #git clone git@github.com:cihalos/solahic.git ~/solahic
+    git clone git@github.com:cihalos/solahic.git /etc/solahic
 
     # Se o repositório ainda não existe, gere uma chave SSH se ela não existir.
     if [ ! -f ~/.ssh/id_rsa.pub ]; then
@@ -61,12 +56,17 @@ if [ ! -d ~/solahic ]; then
 fi
 
 # Carregue as personalizações do repositório solahic.
-if [ -d ~/solahic ]; then
-    source ~/solahic/.bashrc
+#if [ -d ~/solahic ]; then
+#    source ~/solahic/.bashrc
+#fi
+
+if [ -d /etc/solahic ]; then
+    source /etc/solahic/.bashrc
 fi
 
 # Execute git push ao sair da pasta solahic.
-# check_exit_directory
+check_exit_directory
+
 
 # Ative o preenchimento automático no bash em shells interativos.
 if ! shopt -oq posix; then
@@ -99,4 +99,7 @@ if [ -x /usr/lib/command-not-found -o -x /usr/share/command-not-found/command-no
         fi
     }
 fi
+clear;
+export TERM=xterm
+export EDITOR=vim
 
